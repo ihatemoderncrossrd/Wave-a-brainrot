@@ -1,16 +1,15 @@
 -- Wave a brainrot | New Year GUI
--- PC only | Open with E
+-- Full fixed version
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
--- GUI
+-- ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "WaveABrainrotGUI"
 gui.ResetOnSpawn = false
-gui.Enabled = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main frame
@@ -19,21 +18,20 @@ main.Size = UDim2.fromScale(0.35, 0.45)
 main.Position = UDim2.fromScale(0.325, 0.275)
 main.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 main.BorderSizePixel = 0
-main.AnchorPoint = Vector2.new(0,0)
-
+main.Visible = false
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 16)
 
 -- Title
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -40, 0, 40)
 title.Position = UDim2.new(0, 20, 0, 10)
-title.Text = "❄️ Wave a brainrot ❄️"
+title.Text = "❄ Wave a brainrot ❄"
 title.TextColor3 = Color3.fromRGB(230, 240, 255)
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
 title.BackgroundTransparency = 1
 
--- Close button
+-- Close
 local close = Instance.new("TextButton", main)
 close.Size = UDim2.fromOffset(30, 30)
 close.Position = UDim2.new(1, -35, 0, 10)
@@ -42,9 +40,8 @@ close.TextScaled = true
 close.Font = Enum.Font.GothamBold
 close.TextColor3 = Color3.fromRGB(255, 120, 120)
 close.BackgroundTransparency = 1
-
 close.MouseButton1Click:Connect(function()
- gui.Enabled = false
+	main.Visible = false
 end)
 
 -- Tabs
@@ -54,16 +51,16 @@ tabFrame.Position = UDim2.new(0, 20, 0, 60)
 tabFrame.BackgroundTransparency = 1
 
 local function makeTab(text, x)
- local b = Instance.new("TextButton", tabFrame)
- b.Size = UDim2.new(0.5, -5, 1, 0)
- b.Position = UDim2.new(x, 0, 0, 0)
- b.Text = text
- b.Font = Enum.Font.GothamBold
- b.TextScaled = true
- b.TextColor3 = Color3.fromRGB(200, 220, 255)
- b.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
- Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
- return b
+	local b = Instance.new("TextButton", tabFrame)
+	b.Size = UDim2.new(0.5, -5, 1, 0)
+	b.Position = UDim2.new(x, 0, 0, 0)
+	b.Text = text
+	b.Font = Enum.Font.GothamBold
+	b.TextScaled = true
+	b.TextColor3 = Color3.fromRGB(200, 220, 255)
+	b.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
+	return b
 end
 
 local tpTab = makeTab("Teleport", 0)
@@ -85,26 +82,119 @@ creatorPage.BackgroundTransparency = 1
 creatorPage.Visible = false
 
 local function switch(page)
- teleportPage.Visible = false
- creatorPage.Visible = false
- page.Visible = true
+	teleportPage.Visible = false
+	creatorPage.Visible = false
+	page.Visible = true
 end
 
 tpTab.MouseButton1Click:Connect(function()
- switch(teleportPage)
+	switch(teleportPage)
 end)
 
 crTab.MouseButton1Click:Connect(function()
- switch(creatorPage)
+	switch(creatorPage)
 end)
 
--- Teleport buttons
+-- Teleports
+local lobbyCF = CFrame.new(
+	148.065033, 7.52932262, 0,
+	0.90629667, -0.422642082, 0,
+	0.422642082, 0.90629667, 0,
+	0, 0, 1
+)
+
+local celestialCF = CFrame.new(
+	2607.5, -9.02498817, 0,
+	0, 0, 1,
+	-1, 0, 0,
+	0, -1, 0
+)
+
 local function tpButton(text, y, cf)
- local b = Instance.new("TextButton", teleportPage)
- b.Size = UDim2.new(1, 0, 0, 45)
- b.Position = UDim2.new(0, 0, 0, y)
- b.Text = text
- b.Font = Enum.Font.GothamBold
+	local b = Instance.new("TextButton", teleportPage)
+	b.Size = UDim2.new(1, 0, 0, 45)
+	b.Position = UDim2.new(0, 0, 0, y)
+	b.Text = text
+	b.Font = Enum.Font.GothamBold
+	b.TextScaled = true
+	b.TextColor3 = Color3.fromRGB(240, 240, 255)
+	b.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
+
+	b.MouseButton1Click:Connect(function()
+		local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+		if hrp then hrp.CFrame = cf end
+	end)
+end
+
+tpButton("Lobby (Q)", 0, lobbyCF)
+tpButton("Celestial (F)", 55, celestialCF)
+
+-- Immortality
+local function immortal(char)
+	local hum = char:WaitForChild("Humanoid")
+	hum.MaxHealth = math.huge
+	hum.Health = math.huge
+end
+if player.Character then immortal(player.Character) end
+player.CharacterAdded:Connect(immortal)
+
+-- Creator
+local creatorLabel = Instance.new("TextLabel", creatorPage)
+creatorLabel.Size = UDim2.fromScale(1,1)
+creatorLabel.Text = "Creator:\nBrayserX"
+creatorLabel.Font = Enum.Font.GothamBold
+creatorLabel.TextScaled = true
+creatorLabel.TextColor3 = Color3.fromRGB(200,255,200)
+creatorLabel.BackgroundTransparency = 1
+
+-- Snow
+for i = 1, 30 do
+	local snow = Instance.new("Frame", main)
+	snow.Size = UDim2.fromOffset(6,6)
+	snow.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	snow.BackgroundTransparency = 0.2
+	Instance.new("UICorner", snow).CornerRadius = UDim.new(1,0)
+	task.spawn(function()
+		while true do
+			snow.Position = UDim2.fromScale(math.random(), -0.1)
+			for t = 0, 1, 0.01 do
+				RunService.RenderStepped:Wait()
+				snow.Position += UDim2.fromScale(0, 0.005)
+			end
+		end
+	end)
+end
+
+-- OPEN BUTTON (always visible)
+local openButton = Instance.new("TextButton", gui)
+openButton.Size = UDim2.fromOffset(80, 40)
+openButton.Position = UDim2.new(0, 10, 0.5, -20)
+openButton.Text = "OPEN"
+openButton.Font = Enum.Font.GothamBold
+openButton.TextScaled = true
+openButton.BackgroundColor3 = Color3.fromRGB(60,90,140)
+openButton.TextColor3 = Color3.fromRGB(240,240,255)
+openButton.ZIndex = 100
+Instance.new("UICorner", openButton).CornerRadius = UDim.new(0,12)
+
+openButton.MouseButton1Click:Connect(function()
+	main.Visible = not main.Visible
+end)
+
+-- HOTKEYS
+UIS.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+	if input.KeyCode == Enum.KeyCode.E then
+		main.Visible = not main.Visible
+	elseif input.KeyCode == Enum.KeyCode.Q and hrp then
+		hrp.CFrame = lobbyCF
+	elseif input.KeyCode == Enum.KeyCode.F and hrp then
+		hrp.CFrame = celestialCF
+	end
+end) b.Font = Enum.Font.GothamBold
  b.TextScaled = true
  b.TextColor3 = Color3.fromRGB(240, 240, 255)
  b.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
